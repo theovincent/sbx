@@ -233,6 +233,8 @@ class SAC(OffPolicyAlgorithmJax):
         self.logger.record("train/critic_loss", qf_loss_value.item())
         self.logger.record("train/ent_coef", ent_coef_value.item())
 
+        print("self.key", self.key)
+
     @staticmethod
     @jax.jit
     def update_critic(
@@ -318,7 +320,9 @@ class SAC(OffPolicyAlgorithmJax):
     @staticmethod
     @jax.jit
     def soft_update(tau: float, qf_state: RLTrainState) -> RLTrainState:
-        qf_state = qf_state.replace(target_params=optax.incremental_update(qf_state.params, qf_state.target_params, tau))
+        qf_state = qf_state.replace(
+            target_params=optax.incremental_update(qf_state.params, qf_state.target_params, tau)
+        )
         return qf_state
 
     @staticmethod
@@ -446,5 +450,9 @@ class SAC(OffPolicyAlgorithmJax):
             update_carry["actor_state"],
             update_carry["ent_coef_state"],
             key,
-            (update_carry["info"]["actor_loss"], update_carry["info"]["qf_loss"], update_carry["info"]["ent_coef_loss"]),
+            (
+                update_carry["info"]["actor_loss"],
+                update_carry["info"]["qf_loss"],
+                update_carry["info"]["ent_coef_loss"],
+            ),
         )
